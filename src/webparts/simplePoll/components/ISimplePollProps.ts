@@ -1,3 +1,6 @@
 export interface ISimplePollProps {
-  description: string;
+  pollQuestions: any[];
+  userLoginName: string;
+  userDisplayName: string;
+  openPropertyPane: () => void;
 }

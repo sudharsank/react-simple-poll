@@ -13,7 +13,7 @@
     "group": { "default": "Other" },
     "title": { "default": "Simple Poll" },
     "description": { "default": "A simple poll." },
-    "officeFabricIconFontName": "Page",
+    "officeFabricIconFontName": "BarChartVerticalEdit",
     "properties": {
       "description": "SimplePoll"
     }
