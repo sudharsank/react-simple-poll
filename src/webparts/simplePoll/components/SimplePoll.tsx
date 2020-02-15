@@ -8,11 +8,15 @@ import { DefaultButton, PrimaryButton, ButtonType, IButtonProps, Button } from '
 import { ISimplePollProps } from './ISimplePollProps';
 import { ISimplePollState } from './ISimplePollState';
 import OptionsContainer from './OptionsContainer/OptionsContainer';
+import MessageContainer from './MessageContainer/MessageContainer';
 import { IQuestionDetails, IResponseDetails } from '../../../Models';
 import SPHelper from '../../../Common/SPHelper';
+import { MessageScope } from '../../../Common/enumHelper';
+import * as _ from 'lodash';
 
 export default class SimplePoll extends React.Component<ISimplePollProps, ISimplePollState> {
   private helper: SPHelper = null;
+  private disQuestionId: string;
   constructor(props: ISimplePollProps) {
     super(props);
     this.state = {
@@ -36,34 +40,41 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
 
   public componentDidMount = () => {
     this.getQuestions();
-    this.bindPolls();
+    setTimeout(() => {
+      this.bindPolls();
+    }, 500);
   }
 
   public componentWillReceiveProps = (nextProps: ISimplePollProps): boolean => {
     if (this.props.pollQuestions != nextProps.pollQuestions) {
       this.getQuestions(nextProps.pollQuestions);
+      setTimeout(() => {
+        this.bindPolls();
+      }, 500);
       return true;
     }
   }
 
-  private getQuestions = (questions?: any[]): void => {
+  private getQuestions = (questions?: any[]) => {
     let pquestions: IQuestionDetails[] = [];
-    let tmpQuestions: any[] = (questions) ? questions : this.props.pollQuestions;
+    let tmpQuestions: any[] = (questions) ? questions : (this.props.pollQuestions) ? this.props.pollQuestions : [];
     if (tmpQuestions && tmpQuestions.length > 0) {
       tmpQuestions.map((question) => {
         pquestions.push({
           Id: question.uniqueId,
           DisplayName: question.QTitle,
           Choices: question.QOptions
+          //MultiResponse: question.QMultiResponse
         });
       });
     }
-    this.setState({ PollQuestions: pquestions, displayQuestionId: pquestions[0].Id });
+    this.disQuestionId = (pquestions && pquestions.length > 0) ? pquestions[0].Id : '';
+    this.setState({ PollQuestions: pquestions, displayQuestionId: this.disQuestionId });
   }
 
   private bindPolls = () => {
     this.setState({
-      showProgress: false,
+      showProgress: (this.state.PollQuestions.length > 0) ? true : false,
       enableSubmit: true,
       enableChoices: true,
       showOptions: false,
@@ -75,7 +86,7 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
       MsgContent: "",
       showSubmissionProgress: false
     });
-    //this.getAllUsersResponse();
+    this.getAllUsersResponse();
   }
 
   private _onChange = (ev: React.FormEvent<HTMLInputElement>, option: any): void => {
@@ -126,7 +137,53 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
       showSubmissionProgress: true
     });
     var curUserRes = this.getUserResponse(this.state.UserResponse);
-    await this.helper.submitResponse(curUserRes[0]);
+    try {
+      await this.helper.submitResponse(curUserRes[0]);
+      this.setState({
+        ...this.state,
+        showSubmissionProgress: false,
+        showMessage: true,
+        isError: false,
+        MsgContent: (this.props.SuccessfullVoteSubmissionMsg) ? this.props.SuccessfullVoteSubmissionMsg : strings.SuccessfullVoteSubmission,
+        showChartProgress: true
+      });
+      this.getAllUsersResponse();
+      // setTimeout(() => {
+
+      // }, 1000);
+    } catch (err) {
+      console.log(err);
+      this.setState({
+        ...this.state,
+        enableSubmit: true,
+        enableChoices: true,
+        showSubmissionProgress: false,
+        showMessage: true,
+        isError: true,
+        MsgContent: strings.FailedVoteSubmission
+      });
+    }
+  }
+
+  private getAllUsersResponse = async () => {
+    let usersResponse = await this.helper.getPollResponse((this.state.displayQuestionId) ? this.state.displayQuestionId : this.disQuestionId);
+    console.log(usersResponse);
+    var filRes = _.filter(usersResponse, (o) => { return o.UserID == this.props.currentUserInfo.ID; });
+    if (filRes.length > 0) {
+      this.setState({
+        showChartProgress: true,
+        showChart: true,
+        showOptions: false,
+        showProgress: false
+      });
+    } else {
+      this.setState({
+        showProgress: false,
+        showOptions: true,
+        showChartProgress: false,
+        showChart: false
+      });
+    }
   }
 
   private getUserResponse(UserResponses: IResponseDetails[]): IResponseDetails[] {
@@ -137,20 +194,21 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
 
   public render(): React.ReactElement<ISimplePollProps> {
     //const { pollQuestions } = this.props;
-    const { showProgress, enableChoices, showSubmissionProgress, showChartProgress, PollQuestions } = this.state;
+    const { showProgress, enableChoices, showSubmissionProgress, showChartProgress, PollQuestions, showMessage, MsgContent, isError,
+      showOptions, showChart } = this.state;
     return (
       <div className={styles.simplePoll}>
-        {PollQuestions.length <= 0 &&
+        {(this.props.pollQuestions.length <= 0 && PollQuestions.length <= 0) &&
           <Placeholder iconName='Edit'
             iconText={strings.PlaceholderIconText}
             description={strings.PlaceholderDescription}
             buttonLabel={strings.PlaceholderButtonLabel}
             onConfigure={this.props.openPropertyPane} />
         }
-        {showProgress &&
+        {showProgress && !showChart &&
           <ProgressIndicator label={strings.QuestionLoadingText} description={strings.PlsWait} />
         }
-        {PollQuestions.length > 0 &&
+        {PollQuestions.length > 0 && showOptions &&
           <div className="ms-Grid" dir="ltr">
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
@@ -183,6 +241,16 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
               <ProgressIndicator label={strings.SubmissionLoadingText} description={strings.PlsWait} />
             }
           </div>
+        }
+        {showMessage && MsgContent &&
+          <MessageContainer MessageScope={(isError) ? MessageScope.Failure : MessageScope.Success} Message={MsgContent} />
+        }
+        {showChartProgress && !showChart &&
+          <ProgressIndicator label="Loading the Poll analytics" description="Getting all the responses..." />
+        }
+        {showChart &&
+          // <QuickPollChart PollAnalytics={PollAnalytics} />
+          <div>Chart</div>
         }
       </div>
     );

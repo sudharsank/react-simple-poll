@@ -20,6 +20,7 @@ import { IUserInfo } from '../../Models';
 
 export interface ISimplePollWebPartProps {
   pollQuestions: any[];
+  MsgAfterSubmission: string;
 }
 
 export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePollWebPartProps> {
@@ -38,6 +39,7 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
       SimplePoll,
       {
         pollQuestions: this.properties.pollQuestions,
+        SuccessfullVoteSubmissionMsg: this.properties.MsgAfterSubmission,
         currentUserInfo: this.userinfo,
         openPropertyPane: this.openPropertyPane
       }
@@ -123,9 +125,26 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                           )
                         );
                       }
-                    }
+                    },
+                    // {
+                    //   id: "QMultiResponse",
+                    //   title: "Multi Response",
+                    //   type: CustomCollectionFieldType.boolean,
+                    //   required: true,
+                    //   defaultValue: false                      
+                    // }
                   ],
                   disabled: false
+                }),
+                PropertyPaneTextField('MsgAfterSubmission', {
+                  label: strings.MsgAfterSubmissionLabel,
+                  description: strings.MsgAfterSubmissionDescription,
+                  maxLength: 150,
+                  multiline: true,
+                  rows: 3,
+                  resizable: false,
+                  placeholder: strings.MsgAfterSubmissionPlaceholder,
+                  value: this.properties.MsgAfterSubmission
                 })
               ]
             }

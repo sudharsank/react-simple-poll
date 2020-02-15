@@ -10,6 +10,11 @@ declare interface ISimplePollWebPartStrings {
   PollQuestionsLabel: string;
   PollQuestionsPanelHeader: string;
   PollQuestionsManageButton: string;
+  MsgAfterSubmissionLabel: string;
+  MsgAfterSubmissionDescription: string;
+  MsgAfterSubmissionPlaceholder: string;
+  SuccessfullVoteSubmission: string;
+  FailedVoteSubmission: string;
 }
 
 declare module 'SimplePollWebPartStrings' {
