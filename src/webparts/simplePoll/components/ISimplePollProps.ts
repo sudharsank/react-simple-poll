@@ -1,6 +1,7 @@
+import { IUserInfo } from "../../../Models";
+
 export interface ISimplePollProps {
   pollQuestions: any[];
-  userLoginName: string;
-  userDisplayName: string;
+  currentUserInfo: IUserInfo;
   openPropertyPane: () => void;
 }

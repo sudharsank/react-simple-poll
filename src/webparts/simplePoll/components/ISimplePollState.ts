@@ -1,6 +1,9 @@
+import { IQuestionDetails, IResponseDetails } from "../../../Models";
+
 export interface ISimplePollState {
-	PollQuestions: any[]; //IQuestionDetails[];
-	UserResponse: any[]; //IResponseDetails[];
+	PollQuestions: IQuestionDetails[];
+	UserResponse: IResponseDetails[];
+	displayQuestionId: string;
 	enableSubmit: boolean;
 	enableChoices: boolean;
 	showOptions: boolean;

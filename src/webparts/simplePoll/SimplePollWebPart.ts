@@ -15,26 +15,22 @@ import { sp } from "@pnp/sp/presets/all";
 import * as strings from 'SimplePollWebPartStrings';
 import SimplePoll from './components/SimplePoll';
 import { ISimplePollProps } from './components/ISimplePollProps';
-import PollService from '../../DataProviders/PollService';
-import { IPollService } from '../../Interfaces/IPollService';
+import SPHelper from '../../Common/SPHelper';
+import { IUserInfo } from '../../Models';
 
 export interface ISimplePollWebPartProps {
   pollQuestions: any[];
 }
 
 export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePollWebPartProps> {
-  pollservice: IPollService;
-
+  private helper: SPHelper = null;
+  private userinfo: IUserInfo = null;
   protected async onInit(): Promise<void> {
     await super.onInit();
-    let _serviceScope: ServiceScope;
-    _serviceScope = this.context.serviceScope;
-
-    _serviceScope.whenFinished((): void => {
-      this.pollservice = _serviceScope.consume(PollService.serviceKey as any) as IPollService;
-    });
     // other init code may be present
     sp.setup(this.context);
+    this.helper = new SPHelper();
+    this.userinfo = await this.helper.getCurrentUserInfo();
   }
 
   public render(): void {
@@ -42,8 +38,7 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
       SimplePoll,
       {
         pollQuestions: this.properties.pollQuestions,
-        userLoginName: this.context.pageContext.user.loginName,
-        userDisplayName: this.context.pageContext.user.displayName,
+        currentUserInfo: this.userinfo,
         openPropertyPane: this.openPropertyPane
       }
     );

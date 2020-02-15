@@ -12,9 +12,9 @@ export default class OptionsContainer extends React.Component<IOptionsContainerP
     return (
       <div>
         <ChoiceGroup disabled={disabled}
-          //selectedKey={this._getSelectedKey()}
+          selectedKey={this._getSelectedKey()}
           options={this.onRenderChoiceOptions()} required={true} label="Pick one"
-          //onChange={this._onChange} 
+          onChange={this._onChange} 
           />
       </div>
     )
@@ -27,10 +27,10 @@ export default class OptionsContainer extends React.Component<IOptionsContainerP
       tempChoices = this.props.options.split(',');
     } else tempChoices.push(this.props.options);
     if (tempChoices.length > 0) {
-      tempChoices.map((choice: any) => {
+      tempChoices.map((choice: string) => {
         choices.push({
-          key: choice,
-          text: choice
+          key: choice.trim(),
+          text: choice.trim()
         });
       });
     } else {
