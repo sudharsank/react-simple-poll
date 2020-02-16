@@ -12,9 +12,15 @@ define([], function() {
     PollQuestionsPanelHeader: "Poll Questions list",
     PollQuestionsManageButton: "Manage Questions Info",
     MsgAfterSubmissionLabel: "Success Message:",
-    MsgAfterSubmissionDescription: "Message to display after successfull submission.",
+    MsgAfterSubmissionDescription: "Message to display after successfull submission. Max of 150 characters are allowed.",
     MsgAfterSubmissionPlaceholder: "Message...",
     SuccessfullVoteSubmission: "Thank you for your submission",
-    FailedVoteSubmission: "Sorry, something wrong while submitting. Please try again after sometime."
+    FailedVoteSubmission: "Sorry, something wrong while submitting. Please try again after sometime.",
+    BtnSumbitVote: "Submit Vote",
+    BtnSumbitVoteLabel: "Submit button text:",
+    BtnSumbitVoteDescription: "Text to display on the submit button. Max of 50 characters are allowed",
+    BtnSumbitVotePlaceholder: "Submit button text...",
+    ChartFieldLabel: "Preferred Chart Type",
+    ChartFieldCalloutText: "Select preferrable chart type",
   }
 });

@@ -11,11 +11,11 @@
   "preconfiguredEntries": [{
     "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
     "group": { "default": "Other" },
-    "title": { "default": "Simple Poll" },
-    "description": { "default": "A simple poll." },
+    "title": { "default": "Quick Poll" },
+    "description": { "default": "A quick poll." },
     "officeFabricIconFontName": "BarChartVerticalEdit",
     "properties": {
-      "description": "SimplePoll"
+      
     }
   }]
 }

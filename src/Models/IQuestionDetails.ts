@@ -2,5 +2,8 @@ export interface IQuestionDetails {
 	Id: string;
 	DisplayName: string;
 	Choices?: string;
-	MultiResponse?: boolean;
+	MultiChoice?: boolean;
+	StartDate: Date;
+	EndDate: Date;
+	UseDate: boolean;
 }

@@ -4,5 +4,6 @@ export interface IOptionsContainerProps {
   selectedKey?: () => string;
   options: string;
   label?: string;
-  onChange?: (ev: React.FormEvent<HTMLInputElement>, option: any) => void;
+  multiSelect: boolean;
+  onChange?: (ev: any, option: any, isMultiSel: boolean) => void;
 }

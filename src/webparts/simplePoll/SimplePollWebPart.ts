@@ -9,18 +9,24 @@ import {
   IPropertyPaneDropdownOption
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { PropertyFieldListPicker, PropertyFieldListPickerOrderBy } from '@pnp/spfx-property-controls/lib/PropertyFieldListPicker';
+import { CalloutTriggers } from '@pnp/spfx-property-controls/lib/PropertyFieldHeader';
+import { PropertyFieldChoiceGroupWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldChoiceGroupWithCallout';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
-import { sp } from "@pnp/sp/presets/all";
+import { sp, DateTimeFieldFormatType } from "@pnp/sp/presets/all";
 import * as strings from 'SimplePollWebPartStrings';
 import SimplePoll from './components/SimplePoll';
 import { ISimplePollProps } from './components/ISimplePollProps';
 import SPHelper from '../../Common/SPHelper';
 import { IUserInfo } from '../../Models';
+import { ChartType } from '@pnp/spfx-controls-react/lib/ChartControl';
+import PropertyDatePicker from './components/DatePicker/PropertyDatePicker';
+
 
 export interface ISimplePollWebPartProps {
   pollQuestions: any[];
   MsgAfterSubmission: string;
+  BtnSubmitVoteText: string;
+  chartType: ChartType;
 }
 
 export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePollWebPartProps> {
@@ -40,6 +46,8 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
       {
         pollQuestions: this.properties.pollQuestions,
         SuccessfullVoteSubmissionMsg: this.properties.MsgAfterSubmission,
+        BtnSubmitVoteText: this.properties.BtnSubmitVoteText,
+        chartType: this.properties.chartType ? this.properties.chartType : ChartType.Doughnut,
         currentUserInfo: this.userinfo,
         openPropertyPane: this.openPropertyPane
       }
@@ -80,6 +88,7 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                   label: strings.PollQuestionsLabel,
                   panelHeader: strings.PollQuestionsPanelHeader,
                   manageBtnLabel: strings.PollQuestionsManageButton,
+                  enableSorting: true,
                   value: this.properties.pollQuestions,
                   fields: [
                     {
@@ -126,12 +135,52 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                         );
                       }
                     },
+                    {
+                      id: "QMultiChoice",
+                      title: "Multi Selection",
+                      type: CustomCollectionFieldType.boolean,
+                      defaultValue: false
+                    }
                     // {
-                    //   id: "QMultiResponse",
-                    //   title: "Multi Response",
+                    //   id: "QUseDate",
+                    //   title: "Use Date",
                     //   type: CustomCollectionFieldType.boolean,
                     //   required: true,
-                    //   defaultValue: false                      
+                    //   defaultValue: false
+                    // },
+                    // {
+                    //   id: "QStartDate",
+                    //   title: "StartDate",
+                    //   type: CustomCollectionFieldType.custom,
+                    //   required: true,
+                    //   onCustomRender: (field, value, onUpdate, item, itemId) => {
+                    //     return (
+                    //       React.createElement(PropertyDatePicker, {
+                    //         key: itemId,
+                    //         value: value,
+                    //         onchange: (datevalue: Date) => {
+                    //           onUpdate(field.id, datevalue)
+                    //         }
+                    //       })
+                    //     );
+                    //   }
+                    // },
+                    // {
+                    //   id: "QEndDate",
+                    //   title: "EndDate",
+                    //   type: CustomCollectionFieldType.custom,
+                    //   required: true,
+                    //   onCustomRender: (field, value, onUpdate, item, itemId) => {
+                    //     return (
+                    //       React.createElement(PropertyDatePicker, {
+                    //         key: itemId,
+                    //         value: value,
+                    //         onchange: (datevalue: Date) => {
+                    //           onUpdate(field.id, datevalue)
+                    //         }
+                    //       })
+                    //     );
+                    //   }
                     // }
                   ],
                   disabled: false
@@ -145,6 +194,44 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                   resizable: false,
                   placeholder: strings.MsgAfterSubmissionPlaceholder,
                   value: this.properties.MsgAfterSubmission
+                }),
+                PropertyPaneTextField('BtnSubmitVoteText', {
+                  label: strings.BtnSumbitVoteLabel,
+                  description: strings.BtnSumbitVoteDescription,
+                  maxLength: 50,
+                  multiline: false,
+                  resizable: false,
+                  placeholder: strings.BtnSumbitVotePlaceholder,
+                  value: this.properties.BtnSubmitVoteText
+                }),
+                PropertyFieldChoiceGroupWithCallout('chartType', {
+                  calloutContent: React.createElement('div', {}, strings.ChartFieldCalloutText),
+                  calloutTrigger: CalloutTriggers.Hover,
+                  key: 'choice_charttype',
+                  label: strings.ChartFieldLabel,
+                  options: [
+                    // {
+                    //   key: 'bar',
+                    //   text: 'Bar',
+                    //   checked: this.properties.chartType === 'bar',
+                    //   //iconProps: { officeFabricIconFontName: 'Add' }
+                    // }, 
+                    {
+                      key: 'pie',
+                      text: 'Pie',
+                      checked: this.properties.chartType === ChartType.Pie,
+                      //iconProps: { officeFabricIconFontName: 'PieSingle' }
+                    }, {
+                      key: 'doughnut',
+                      text: 'Doughnut',
+                      checked: this.properties.chartType === ChartType.Doughnut,
+                      //iconProps: { officeFabricIconFontName: 'DonutChart' }
+                    }, {
+                      key: 'polarArea',
+                      text: 'PolarArea',
+                      checked: this.properties.chartType === ChartType.PolarArea,
+                      //iconProps: { officeFabricIconFontName: 'DonutChart' }
+                    }]
                 })
               ]
             }

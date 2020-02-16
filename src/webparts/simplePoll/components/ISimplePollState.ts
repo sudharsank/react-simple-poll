@@ -15,4 +15,5 @@ export interface ISimplePollState {
 	MsgContent: string;
 	PollAnalytics: any; //IPollAnalyticsInfo;
 	showSubmissionProgress: boolean;
+	currentPollResponse: string;
 }

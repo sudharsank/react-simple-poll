@@ -15,6 +15,12 @@ declare interface ISimplePollWebPartStrings {
   MsgAfterSubmissionPlaceholder: string;
   SuccessfullVoteSubmission: string;
   FailedVoteSubmission: string;
+  BtnSumbitVote: string;
+  BtnSumbitVoteLabel: string;
+  BtnSumbitVoteDescription: string;
+  BtnSumbitVotePlaceholder: string;
+  ChartFieldLabel: string;
+  ChartFieldCalloutText:string;
 }
 
 declare module 'SimplePollWebPartStrings' {

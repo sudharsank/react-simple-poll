@@ -6,4 +6,5 @@ export interface IResponseDetails {
     PollMultiResponse?: string[];
     PollQuestion: string;
     PollQuestionId: string;
+    IsMulti: boolean;
 }
