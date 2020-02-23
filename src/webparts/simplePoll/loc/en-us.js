@@ -2,6 +2,7 @@ define([], function() {
   return {
     PropertyPaneDescription: "Below properties will help you manage your poll questions and extra features that you can leverage.",
     BasicGroupName: "",
+    ListCreationText: "Creating the response list...",
     PlaceholderIconText: "Configure your Quick Poll",
     PlaceholderDescription: "",
     PlaceholderButtonLabel: "Come on...",

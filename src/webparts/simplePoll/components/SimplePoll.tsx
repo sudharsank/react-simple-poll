@@ -22,6 +22,7 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
   constructor(props: ISimplePollProps) {
     super(props);
     this.state = {
+      listExists: false,
       PollQuestions: [],
       UserResponse: [],
       displayQuestionId: "",
@@ -42,7 +43,7 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
   }
 
   public componentDidMount = () => {
-    this.getQuestions();
+    this.checkAndCreateList();
   }
 
   public componentDidUpdate = (prevProps: ISimplePollProps) => {
@@ -53,6 +54,16 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
       this.setState({
         PollAnalytics: newPollAnalytics
       }, this.bindResponseAnalytics);
+    }
+  }
+
+  private async checkAndCreateList() {
+    this.helper = new SPHelper();
+    let listCreated = await this.helper.checkListExists();
+    if (listCreated) {
+      this.setState({ listExists: true }, () => {
+        this.getQuestions();
+      });
     }
   }
 
@@ -70,7 +81,6 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
   // }
 
   private getQuestions = (questions?: any[]) => {
-    console.log(this.props.pollQuestions);
     let pquestions: IQuestionDetails[] = [];
     let tmpQuestions: any[] = (questions) ? questions : (this.props.pollQuestions) ? this.props.pollQuestions : [];
     if (tmpQuestions && tmpQuestions.length > 0) {
@@ -255,67 +265,74 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
   public render(): React.ReactElement<ISimplePollProps> {
     const { pollQuestions, BtnSubmitVoteText, ResponseMsgToUser } = this.props;
     const { showProgress, enableChoices, showSubmissionProgress, showChartProgress, PollQuestions, showMessage, MsgContent, isError,
-      showOptions, showChart, PollAnalytics, currentPollResponse, enableSubmit } = this.state;
+      showOptions, showChart, PollAnalytics, currentPollResponse, enableSubmit, listExists } = this.state;
     const showConfig: boolean = (!pollQuestions || pollQuestions.length <= 0 && (!PollQuestions || PollQuestions.length <= 0)) ? true : false;
     let userResponseCaption: string = (ResponseMsgToUser && ResponseMsgToUser.trim()) ? ResponseMsgToUser.trim() : strings.DefaultResponseMsgToUser;
     let submitButtonText: string = (BtnSubmitVoteText && BtnSubmitVoteText.trim()) ? BtnSubmitVoteText.trim() : strings.BtnSumbitVote;
     return (
       <div className={styles.simplePoll}>
-        {showConfig &&
-          <Placeholder iconName='Edit'
-            iconText={strings.PlaceholderIconText}
-            description={strings.PlaceholderDescription}
-            buttonLabel={strings.PlaceholderButtonLabel}
-            onConfigure={this.props.openPropertyPane} />
-        }
-        {showProgress && !showChart &&
-          <ProgressIndicator label={strings.QuestionLoadingText} description={strings.PlsWait} />
-        }
-        {PollQuestions && PollQuestions.length > 0 && showOptions &&
-          <div className="ms-Grid" dir="ltr">
-            <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
-                <div className="ms-textAlignLeft ms-font-m-plus ms-fontWeight-semibold">
-                  {PollQuestions[0].DisplayName}
+        {!listExists ? (
+          <ProgressIndicator label={strings.ListCreationText} description={strings.PlsWait} />
+        ) : (
+            <>
+              {showConfig &&
+                <Placeholder iconName='Edit'
+                  iconText={strings.PlaceholderIconText}
+                  description={strings.PlaceholderDescription}
+                  buttonLabel={strings.PlaceholderButtonLabel}
+                  onConfigure={this.props.openPropertyPane} />
+              }
+              {showProgress && !showChart &&
+                <ProgressIndicator label={strings.QuestionLoadingText} description={strings.PlsWait} />
+              }
+              {PollQuestions && PollQuestions.length > 0 && showOptions &&
+                <div className="ms-Grid" dir="ltr">
+                  <div className="ms-Grid-row">
+                    <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
+                      <div className="ms-textAlignLeft ms-font-m-plus ms-fontWeight-semibold">
+                        {PollQuestions[0].DisplayName}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ms-Grid-row">
+                    <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
+                      <div className="ms-textAlignLeft ms-font-m-plus ms-fontWeight-semibold">
+                        <OptionsContainer disabled={!enableChoices} multiSelect={PollQuestions[0].MultiChoice}
+                          selectedKey={this._getSelectedKey}
+                          options={PollQuestions[0].Choices}
+                          label="Pick One"
+                          onChange={this._onChange}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ms-Grid-row">
+                    <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
+                      <div className="ms-textAlignCenter ms-font-m-plus ms-fontWeight-semibold">
+                        <PrimaryButton disabled={!enableSubmit} text={submitButtonText}
+                          onClick={this._submitVote.bind(this)} />
+                      </div>
+                    </div>
+                  </div>
+                  {showSubmissionProgress && !showChartProgress &&
+                    <ProgressIndicator label={strings.SubmissionLoadingText} description={strings.PlsWait} />
+                  }
                 </div>
-              </div>
-            </div>
-            <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
-                <div className="ms-textAlignLeft ms-font-m-plus ms-fontWeight-semibold">
-                  <OptionsContainer disabled={!enableChoices} multiSelect={PollQuestions[0].MultiChoice}
-                    selectedKey={this._getSelectedKey}
-                    options={PollQuestions[0].Choices}
-                    label="Pick One"
-                    onChange={this._onChange}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="ms-Grid-row">
-              <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
-                <div className="ms-textAlignCenter ms-font-m-plus ms-fontWeight-semibold">
-                  <PrimaryButton disabled={!enableSubmit} text={submitButtonText}
-                    onClick={this._submitVote.bind(this)} />
-                </div>
-              </div>
-            </div>
-            {showSubmissionProgress && !showChartProgress &&
-              <ProgressIndicator label={strings.SubmissionLoadingText} description={strings.PlsWait} />
-            }
-          </div>
-        }
-        {showMessage && MsgContent &&
-          <MessageContainer MessageScope={(isError) ? MessageScope.Failure : MessageScope.Success} Message={MsgContent} />
-        }
-        {showChartProgress && !showChart &&
-          <ProgressIndicator label="Loading the Poll analytics" description="Getting all the responses..." />
-        }
-        {showChart &&
-          <>
-            <QuickPollChart PollAnalytics={PollAnalytics} />
-            <MessageContainer MessageScope={MessageScope.Info} Message={`${userResponseCaption}: ${currentPollResponse}`} />
-          </>
+              }
+              {showMessage && MsgContent &&
+                <MessageContainer MessageScope={(isError) ? MessageScope.Failure : MessageScope.Success} Message={MsgContent} />
+              }
+              {showChartProgress && !showChart &&
+                <ProgressIndicator label="Loading the Poll analytics" description="Getting all the responses..." />
+              }
+              {showChart &&
+                <>
+                  <QuickPollChart PollAnalytics={PollAnalytics} />
+                  <MessageContainer MessageScope={MessageScope.Info} Message={`${userResponseCaption}: ${currentPollResponse}`} />
+                </>
+              }
+            </>
+          )
         }
       </div>
     );

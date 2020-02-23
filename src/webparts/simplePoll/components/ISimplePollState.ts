@@ -1,6 +1,7 @@
 import { IQuestionDetails, IResponseDetails } from "../../../Models";
 
 export interface ISimplePollState {
+	listExists: boolean;
 	PollQuestions: IQuestionDetails[];
 	UserResponse: IResponseDetails[];
 	displayQuestionId: string;

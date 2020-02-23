@@ -1,6 +1,7 @@
 declare interface ISimplePollWebPartStrings {
   PropertyPaneDescription: string;
   BasicGroupName: string;
+  ListCreationText: string;
   PlaceholderIconText: string;
   PlaceholderDescription: string;
   PlaceholderButtonLabel: string;
