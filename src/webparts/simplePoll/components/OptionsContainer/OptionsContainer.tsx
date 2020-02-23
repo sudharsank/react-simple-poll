@@ -92,7 +92,7 @@ export default class OptionsContainer extends React.Component<IOptionsContainerP
         finalSel.push(item);
       } else finalSel = _.filter(finalSel, (o) => { return o !== item; });
     } else {
-      isChecked ? finalSel.push(item) : null;
+      if (isChecked) finalSel.push(item);
     }
     this.setState({ selChoices: finalSel });
     this.props.onChange(ev, { key: finalSel }, true);
