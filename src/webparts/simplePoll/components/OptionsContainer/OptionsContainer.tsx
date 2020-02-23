@@ -2,7 +2,6 @@ import * as React from 'react';
 import { ChoiceGroup, IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
 import { List } from 'office-ui-fabric-react/lib/List';
 import { Checkbox } from 'office-ui-fabric-react/lib/Checkbox';
-import { Stack } from 'office-ui-fabric-react/lib/Stack';
 import { IOptionsContainerProps } from './IOptionsContainerProps';
 import * as _ from 'lodash';
 
@@ -34,7 +33,6 @@ export default class OptionsContainer extends React.Component<IOptionsContainerP
             />
           )
         }
-
       </div>
     );
   }
@@ -50,8 +48,8 @@ export default class OptionsContainer extends React.Component<IOptionsContainerP
   private _onRenderCell = (item: any, index: number | undefined): JSX.Element => {
     return (
       <div style={{ marginBottom: "15px" }}>
-        <Checkbox label={item}  onChange={this._makeChangeHandler(item)} />
-      </div>      
+        <Checkbox label={item} onChange={this._makeChangeHandler(item)} />
+      </div>
     );
   }
 
@@ -91,11 +89,10 @@ export default class OptionsContainer extends React.Component<IOptionsContainerP
     let finalSel: string[] = this.state.selChoices;
     if (finalSel.length > 0) {
       if (isChecked) {
-        //var fil = _.filter(finalSel, (o) => { return o.toLowerCase() == item.toLowerCase(); });
         finalSel.push(item);
       } else finalSel = _.filter(finalSel, (o) => { return o !== item; });
     } else {
-      isChecked ? finalSel.push(item) : "";
+      isChecked ? finalSel.push(item) : null;
     }
     this.setState({ selChoices: finalSel });
     this.props.onChange(ev, { key: finalSel }, true);

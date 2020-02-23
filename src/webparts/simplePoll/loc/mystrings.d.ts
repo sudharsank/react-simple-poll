@@ -13,6 +13,10 @@ declare interface ISimplePollWebPartStrings {
   MsgAfterSubmissionLabel: string;
   MsgAfterSubmissionDescription: string;
   MsgAfterSubmissionPlaceholder: string;
+  ResponseMsgToUserLabel: string;
+  ResponseMsgToUserDescription: string;
+  ResponseMsgToUserPlaceholder: string;
+  DefaultResponseMsgToUser: string;
   SuccessfullVoteSubmission: string;
   FailedVoteSubmission: string;
   BtnSumbitVote: string;
@@ -21,6 +25,12 @@ declare interface ISimplePollWebPartStrings {
   BtnSumbitVotePlaceholder: string;
   ChartFieldLabel: string;
   ChartFieldCalloutText:string;
+
+  Q_Title_Title: string;
+  Q_Title_Placeholder: string;
+  Q_Options_Title: string;
+  Q_Options_Placeholder: string;
+  MultiChoice_Title: string;
 }
 
 declare module 'SimplePollWebPartStrings' {

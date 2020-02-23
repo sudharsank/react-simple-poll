@@ -3,23 +3,19 @@ import * as ReactDom from 'react-dom';
 import { Version, ServiceScope } from '@microsoft/sp-core-library';
 import {
   IPropertyPaneConfiguration,
-  PropertyPaneDropdown,
-  PropertyPaneDropdownOptionType,
   PropertyPaneTextField,
-  IPropertyPaneDropdownOption
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { CalloutTriggers } from '@pnp/spfx-property-controls/lib/PropertyFieldHeader';
 import { PropertyFieldChoiceGroupWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldChoiceGroupWithCallout';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
-import { sp, DateTimeFieldFormatType } from "@pnp/sp/presets/all";
+import { sp } from "@pnp/sp/presets/all";
 import * as strings from 'SimplePollWebPartStrings';
 import SimplePoll from './components/SimplePoll';
 import { ISimplePollProps } from './components/ISimplePollProps';
 import SPHelper from '../../Common/SPHelper';
 import { IUserInfo } from '../../Models';
 import { ChartType } from '@pnp/spfx-controls-react/lib/ChartControl';
-import PropertyDatePicker from './components/DatePicker/PropertyDatePicker';
 
 
 export interface ISimplePollWebPartProps {
@@ -27,6 +23,7 @@ export interface ISimplePollWebPartProps {
   MsgAfterSubmission: string;
   BtnSubmitVoteText: string;
   chartType: ChartType;
+  ResponseMsgToUser: string;
 }
 
 export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePollWebPartProps> {
@@ -34,7 +31,6 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
   private userinfo: IUserInfo = null;
   protected async onInit(): Promise<void> {
     await super.onInit();
-    // other init code may be present
     sp.setup(this.context);
     this.helper = new SPHelper();
     this.userinfo = await this.helper.getCurrentUserInfo();
@@ -46,6 +42,7 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
       {
         pollQuestions: this.properties.pollQuestions,
         SuccessfullVoteSubmissionMsg: this.properties.MsgAfterSubmission,
+        ResponseMsgToUser: this.properties.ResponseMsgToUser,
         BtnSubmitVoteText: this.properties.BtnSubmitVoteText,
         chartType: this.properties.chartType ? this.properties.chartType : ChartType.Doughnut,
         currentUserInfo: this.userinfo,
@@ -93,7 +90,7 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                   fields: [
                     {
                       id: "QTitle",
-                      title: "Question Title",
+                      title: strings.Q_Title_Title,
                       type: CustomCollectionFieldType.custom,
                       required: true,
                       onCustomRender: (field, value, onUpdate, item, itemId) => {
@@ -102,7 +99,7 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                             React.createElement("textarea",
                               {
                                 style: { width: "250px", height: "70px" },
-                                placeholder: "Question Title",
+                                placeholder: strings.Q_Title_Placeholder,
                                 key: itemId,
                                 value: value,
                                 onChange: (event: React.FormEvent<HTMLTextAreaElement>) => {
@@ -115,7 +112,7 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                     },
                     {
                       id: "QOptions",
-                      title: "Choices",
+                      title: strings.Q_Options_Title,
                       type: CustomCollectionFieldType.custom,
                       required: true,
                       onCustomRender: (field, value, onUpdate, item, itemId) => {
@@ -124,7 +121,7 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                             React.createElement("textarea",
                               {
                                 style: { width: "250px", height: "70px" },
-                                placeholder: "Choices separated by comma",
+                                placeholder: strings.Q_Options_Placeholder,
                                 key: itemId,
                                 value: value,
                                 onChange: (event: React.FormEvent<HTMLTextAreaElement>) => {
@@ -137,51 +134,10 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                     },
                     {
                       id: "QMultiChoice",
-                      title: "Multi Selection",
+                      title: strings.MultiChoice_Title,
                       type: CustomCollectionFieldType.boolean,
                       defaultValue: false
                     }
-                    // {
-                    //   id: "QUseDate",
-                    //   title: "Use Date",
-                    //   type: CustomCollectionFieldType.boolean,
-                    //   required: true,
-                    //   defaultValue: false
-                    // },
-                    // {
-                    //   id: "QStartDate",
-                    //   title: "StartDate",
-                    //   type: CustomCollectionFieldType.custom,
-                    //   required: true,
-                    //   onCustomRender: (field, value, onUpdate, item, itemId) => {
-                    //     return (
-                    //       React.createElement(PropertyDatePicker, {
-                    //         key: itemId,
-                    //         value: value,
-                    //         onchange: (datevalue: Date) => {
-                    //           onUpdate(field.id, datevalue)
-                    //         }
-                    //       })
-                    //     );
-                    //   }
-                    // },
-                    // {
-                    //   id: "QEndDate",
-                    //   title: "EndDate",
-                    //   type: CustomCollectionFieldType.custom,
-                    //   required: true,
-                    //   onCustomRender: (field, value, onUpdate, item, itemId) => {
-                    //     return (
-                    //       React.createElement(PropertyDatePicker, {
-                    //         key: itemId,
-                    //         value: value,
-                    //         onchange: (datevalue: Date) => {
-                    //           onUpdate(field.id, datevalue)
-                    //         }
-                    //       })
-                    //     );
-                    //   }
-                    // }
                   ],
                   disabled: false
                 }),
@@ -194,6 +150,16 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                   resizable: false,
                   placeholder: strings.MsgAfterSubmissionPlaceholder,
                   value: this.properties.MsgAfterSubmission
+                }),
+                PropertyPaneTextField('ResponseMsgToUser', {
+                  label: strings.ResponseMsgToUserLabel,
+                  description: strings.ResponseMsgToUserDescription,
+                  maxLength: 150,
+                  multiline: true,
+                  rows: 3,
+                  resizable: false,
+                  placeholder: strings.ResponseMsgToUserPlaceholder,
+                  value: this.properties.ResponseMsgToUser
                 }),
                 PropertyPaneTextField('BtnSubmitVoteText', {
                   label: strings.BtnSumbitVoteLabel,
@@ -208,29 +174,23 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                   calloutContent: React.createElement('div', {}, strings.ChartFieldCalloutText),
                   calloutTrigger: CalloutTriggers.Hover,
                   key: 'choice_charttype',
-                  label: strings.ChartFieldLabel,
+                  label: strings.ChartFieldLabel,                  
                   options: [
-                    // {
-                    //   key: 'bar',
-                    //   text: 'Bar',
-                    //   checked: this.properties.chartType === 'bar',
-                    //   //iconProps: { officeFabricIconFontName: 'Add' }
-                    // }, 
                     {
                       key: 'pie',
                       text: 'Pie',
                       checked: this.properties.chartType === ChartType.Pie,
-                      //iconProps: { officeFabricIconFontName: 'PieSingle' }
+                      iconProps: { officeFabricIconFontName: 'PieSingle' }
                     }, {
                       key: 'doughnut',
                       text: 'Doughnut',
                       checked: this.properties.chartType === ChartType.Doughnut,
-                      //iconProps: { officeFabricIconFontName: 'DonutChart' }
+                      iconProps: { officeFabricIconFontName: 'DonutChart' }
                     }, {
                       key: 'polarArea',
                       text: 'PolarArea',
                       checked: this.properties.chartType === ChartType.PolarArea,
-                      //iconProps: { officeFabricIconFontName: 'DonutChart' }
+                      iconProps: { officeFabricIconFontName: 'ScatterChart' }
                     }]
                 })
               ]

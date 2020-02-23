@@ -14,6 +14,10 @@ define([], function() {
     MsgAfterSubmissionLabel: "Success Message:",
     MsgAfterSubmissionDescription: "Message to display after successfull submission. Max of 150 characters are allowed.",
     MsgAfterSubmissionPlaceholder: "Message...",
+    ResponseMsgToUserLabel: "Response Message:",
+    ResponseMsgToUserDescription: "Message displayed once the user submitted the poll. E.g., 'You voted for: <User Response>'",
+    ResponseMsgToUserPlaceholder: "Message...",
+    DefaultResponseMsgToUser: "You voted for",
     SuccessfullVoteSubmission: "Thank you for your submission",
     FailedVoteSubmission: "Sorry, something wrong while submitting. Please try again after sometime.",
     BtnSumbitVote: "Submit Vote",
@@ -22,5 +26,11 @@ define([], function() {
     BtnSumbitVotePlaceholder: "Submit button text...",
     ChartFieldLabel: "Preferred Chart Type",
     ChartFieldCalloutText: "Select preferrable chart type",
+
+    Q_Title_Title: "Question Title",
+    Q_Title_Placeholder: "Question Title...",
+    Q_Options_Title: "Choices",
+    Q_Options_Placeholder: "Choices separated by comma",
+    MultiChoice_Title: "Multi Selection"
   }
 });

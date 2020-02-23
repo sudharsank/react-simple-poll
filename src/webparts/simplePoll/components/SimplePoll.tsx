@@ -4,7 +4,7 @@ import * as strings from 'SimplePollWebPartStrings';
 import { escape } from '@microsoft/sp-lodash-subset';
 import { Placeholder } from "@pnp/spfx-controls-react/lib/Placeholder";
 import { ProgressIndicator } from 'office-ui-fabric-react/lib/ProgressIndicator';
-import { DefaultButton, PrimaryButton, ButtonType, IButtonProps, Button } from 'office-ui-fabric-react/lib/Button';
+import { PrimaryButton } from 'office-ui-fabric-react/lib/Button';
 import { ISimplePollProps } from './ISimplePollProps';
 import { ISimplePollState } from './ISimplePollState';
 import OptionsContainer from './OptionsContainer/OptionsContainer';
@@ -43,27 +43,31 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
 
   public componentDidMount = () => {
     this.getQuestions();
-    // setTimeout(() => {
-    //   this.bindPolls();
-    // }, 500);
   }
 
-  public componentWillReceiveProps = (nextProps: ISimplePollProps) => {
-    if (this.props.pollQuestions != nextProps.pollQuestions) {
-      this.getQuestions(nextProps.pollQuestions);
-      // setTimeout(() => {
-      //   this.bindPolls();
-      // }, 500);
-      // return true;
-    }
-    if (this.props.chartType != nextProps.chartType) {
+  public componentDidUpdate = (prevProps: ISimplePollProps) => {
+    if (prevProps.pollQuestions !== this.props.pollQuestions) this.getQuestions(this.props.pollQuestions);
+    if (prevProps.chartType !== this.props.chartType) {
       let newPollAnalytics: IPollAnalyticsInfo = this.state.PollAnalytics;
-      newPollAnalytics.ChartType = nextProps.chartType;
+      newPollAnalytics.ChartType = this.props.chartType;
       this.setState({
         PollAnalytics: newPollAnalytics
       }, this.bindResponseAnalytics);
     }
   }
+
+  // public componentWillReceiveProps = (nextProps: ISimplePollProps) => {
+  //   if (this.props.pollQuestions != nextProps.pollQuestions) {
+  //     this.getQuestions(nextProps.pollQuestions);
+  //   }
+  //   if (this.props.chartType != nextProps.chartType) {
+  //     let newPollAnalytics: IPollAnalyticsInfo = this.state.PollAnalytics;
+  //     newPollAnalytics.ChartType = nextProps.chartType;
+  //     this.setState({
+  //       PollAnalytics: newPollAnalytics
+  //     }, this.bindResponseAnalytics);
+  //   }
+  // }
 
   private getQuestions = (questions?: any[]) => {
     console.log(this.props.pollQuestions);
@@ -249,10 +253,12 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
   }
 
   public render(): React.ReactElement<ISimplePollProps> {
-    const { pollQuestions, BtnSubmitVoteText } = this.props;
+    const { pollQuestions, BtnSubmitVoteText, ResponseMsgToUser } = this.props;
     const { showProgress, enableChoices, showSubmissionProgress, showChartProgress, PollQuestions, showMessage, MsgContent, isError,
-      showOptions, showChart, PollAnalytics, UserResponse } = this.state;
+      showOptions, showChart, PollAnalytics, currentPollResponse, enableSubmit } = this.state;
     const showConfig: boolean = (!pollQuestions || pollQuestions.length <= 0 && (!PollQuestions || PollQuestions.length <= 0)) ? true : false;
+    let userResponseCaption: string = (ResponseMsgToUser && ResponseMsgToUser.trim()) ? ResponseMsgToUser.trim() : strings.DefaultResponseMsgToUser;
+    let submitButtonText: string = (BtnSubmitVoteText && BtnSubmitVoteText.trim()) ? BtnSubmitVoteText.trim() : strings.BtnSumbitVote;
     return (
       <div className={styles.simplePoll}>
         {showConfig &&
@@ -289,7 +295,7 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
             <div className="ms-Grid-row">
               <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
                 <div className="ms-textAlignCenter ms-font-m-plus ms-fontWeight-semibold">
-                  <PrimaryButton disabled={!this.state.enableSubmit} text={BtnSubmitVoteText && BtnSubmitVoteText.trim() ? BtnSubmitVoteText.trim() : strings.BtnSumbitVote}
+                  <PrimaryButton disabled={!enableSubmit} text={submitButtonText}
                     onClick={this._submitVote.bind(this)} />
                 </div>
               </div>
@@ -308,7 +314,7 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
         {showChart &&
           <>
             <QuickPollChart PollAnalytics={PollAnalytics} />
-            <MessageContainer MessageScope={MessageScope.Info} Message={`You vote for: ${this.state.currentPollResponse}`} />
+            <MessageContainer MessageScope={MessageScope.Info} Message={`${userResponseCaption}: ${currentPollResponse}`} />
           </>
         }
       </div>

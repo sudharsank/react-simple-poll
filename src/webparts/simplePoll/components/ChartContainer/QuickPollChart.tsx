@@ -8,10 +8,6 @@ export interface IQuickPollChartProps {
 
 export default class QuickPollChart extends React.Component<IQuickPollChartProps, {}> {
   private charttype: ChartType = null;
-  constructor(props: IQuickPollChartProps) {
-    super(props);
-  }
-
   public render(): React.ReactElement<IQuickPollChartProps> {
     return (
       <div>
@@ -67,18 +63,4 @@ export default class QuickPollChart extends React.Component<IQuickPollChartProps
         break;
     }
   }
-
-  // componentDidMount(): void {
-  //   if (this.props.PollAnalytics != null && undefined !== this.props.PollAnalytics) {
-  //     this.renderChart();
-  //   }
-  // }
-
-  // public componentWillReceiveProps(nextProps: IQuickPollChartProps): void {
-  //   if (this.props.PollAnalytics !== nextProps.PollAnalytics) {
-  //     this.render();
-  //   }
-  // }
-
-
 }
