@@ -305,7 +305,7 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
               {showProgress && !showChart &&
                 <ProgressIndicator label={strings.QuestionLoadingText} description={strings.PlsWait} />
               }
-              {!displayQuestion &&
+              {!displayQuestion && !showConfig &&
                 <MessageContainer MessageScope={MessageScope.Info} Message={nopollmsg} />
               }
               {PollQuestions && PollQuestions.length > 0 && showOptions && displayQuestion &&
