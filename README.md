@@ -36,6 +36,7 @@
 * Make sure the **Multi Choice** option is chosen wisely, do not change once the user started to response to the poll.
 
 ## Preview
+![Advanced-Comments-Box](./assets/react-quick-poll.gif)
 
 ## Used SharePoint Framework Version 
 ![drop](https://img.shields.io/badge/version-GA-green.svg)
