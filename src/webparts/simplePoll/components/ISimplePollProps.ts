@@ -7,6 +7,8 @@ export interface ISimplePollProps {
   ResponseMsgToUser: string;
   BtnSubmitVoteText: string;
   chartType: ChartType;
+  pollBasedOnDate: boolean;
   currentUserInfo: IUserInfo;
+  NoPollMsg: string;
   openPropertyPane: () => void;
 }

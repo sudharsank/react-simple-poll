@@ -5,6 +5,7 @@ export interface ISimplePollState {
 	PollQuestions: IQuestionDetails[];
 	UserResponse: IResponseDetails[];
 	displayQuestionId: string;
+	displayQuestion: IQuestionDetails;
 	enableSubmit: boolean;
 	enableChoices: boolean;
 	showOptions: boolean;

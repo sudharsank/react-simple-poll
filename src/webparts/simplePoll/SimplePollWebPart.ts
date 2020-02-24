@@ -7,8 +7,10 @@ import {
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { CalloutTriggers } from '@pnp/spfx-property-controls/lib/PropertyFieldHeader';
+import { PropertyFieldToggleWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldToggleWithCallout';
 import { PropertyFieldChoiceGroupWithCallout } from '@pnp/spfx-property-controls/lib/PropertyFieldChoiceGroupWithCallout';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
+import { DateTimePicker, DateConvention, TimeConvention } from '@pnp/spfx-controls-react/lib/DateTimePicker';
 import { sp } from "@pnp/sp/presets/all";
 import * as strings from 'SimplePollWebPartStrings';
 import SimplePoll from './components/SimplePoll';
@@ -24,6 +26,8 @@ export interface ISimplePollWebPartProps {
   BtnSubmitVoteText: string;
   chartType: ChartType;
   ResponseMsgToUser: string;
+  pollBasedOnDate: boolean;
+  NoPollMsg: string;
 }
 
 export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePollWebPartProps> {
@@ -45,6 +49,8 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
         ResponseMsgToUser: this.properties.ResponseMsgToUser,
         BtnSubmitVoteText: this.properties.BtnSubmitVoteText,
         chartType: this.properties.chartType ? this.properties.chartType : ChartType.Doughnut,
+        pollBasedOnDate: this.properties.pollBasedOnDate,
+        NoPollMsg: this.properties.NoPollMsg,
         currentUserInfo: this.userinfo,
         openPropertyPane: this.openPropertyPane
       }
@@ -80,6 +86,15 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
             {
               groupName: strings.BasicGroupName,
               groupFields: [
+                PropertyFieldToggleWithCallout('pollBasedOnDate', {
+                  calloutTrigger: CalloutTriggers.Hover,
+                  key: 'pollBasedOnDateFieldId',
+                  label: strings.PollDateLabel,
+                  calloutContent: React.createElement('div', {}, strings.PollDateCalloutText),
+                  onText: 'Yes',
+                  offText: 'No',
+                  checked: this.properties.pollBasedOnDate
+                }),
                 PropertyFieldCollectionData("pollQuestions", {
                   key: "pollQuestions",
                   label: strings.PollQuestionsLabel,
@@ -137,6 +152,50 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                       title: strings.MultiChoice_Title,
                       type: CustomCollectionFieldType.boolean,
                       defaultValue: false
+                    },
+                    {
+                      id: "QStartDate",
+                      title: strings.Q_StartDate_Title,
+                      type: CustomCollectionFieldType.custom,
+                      required: false,
+                      onCustomRender: (field, value, onUpdate, item, itemId) => {
+                        return (
+                          React.createElement(DateTimePicker, {
+                            key: itemId,
+                            showLabels: false,
+                            dateConvention: DateConvention.Date,
+                            showGoToToday: true,
+                            showMonthPickerAsOverlay: true,
+                            value: value ? new Date(value) : null,
+                            disabled: !this.properties.pollBasedOnDate,
+                            onChange: (date: Date) => {
+                              onUpdate(field.id, date);
+                            }
+                          })
+                        );
+                      }
+                    },
+                    {
+                      id: "QEndDate",
+                      title: strings.Q_EndDate_Title,
+                      type: CustomCollectionFieldType.custom,
+                      required: false,
+                      onCustomRender: (field, value, onUpdate, item, itemId) => {
+                        return (
+                          React.createElement(DateTimePicker, {
+                            key: itemId,
+                            showLabels: false,
+                            dateConvention: DateConvention.Date,
+                            showGoToToday: true,
+                            showMonthPickerAsOverlay: true,
+                            value: value ? new Date(value) : null,
+                            disabled: !this.properties.pollBasedOnDate,
+                            onChange: (date: Date) => {
+                              onUpdate(field.id, date);
+                            }
+                          })
+                        );
+                      }
                     }
                   ],
                   disabled: false
@@ -170,11 +229,21 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                   placeholder: strings.BtnSumbitVotePlaceholder,
                   value: this.properties.BtnSubmitVoteText
                 }),
+                PropertyPaneTextField('NoPollMsg', {
+                  label: strings.NoPollMsgLabel,
+                  description: strings.NoPollMsgDescription,
+                  maxLength: 150,
+                  multiline: true,
+                  rows: 3,
+                  resizable: false,
+                  placeholder: strings.NoPollMsgPlaceholder,
+                  value: this.properties.NoPollMsg
+                }),
                 PropertyFieldChoiceGroupWithCallout('chartType', {
                   calloutContent: React.createElement('div', {}, strings.ChartFieldCalloutText),
                   calloutTrigger: CalloutTriggers.Hover,
                   key: 'choice_charttype',
-                  label: strings.ChartFieldLabel,                  
+                  label: strings.ChartFieldLabel,
                   options: [
                     {
                       key: 'pie',
@@ -202,7 +271,7 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                       checked: this.properties.chartType === ChartType.Line,
                       iconProps: { officeFabricIconFontName: 'LineChart' }
                     }]
-                })
+                })                
               ]
             }
           ]

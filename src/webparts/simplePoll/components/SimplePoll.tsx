@@ -1,7 +1,6 @@
 import * as React from 'react';
 import styles from './SimplePoll.module.scss';
 import * as strings from 'SimplePollWebPartStrings';
-import { escape } from '@microsoft/sp-lodash-subset';
 import { Placeholder } from "@pnp/spfx-controls-react/lib/Placeholder";
 import { ProgressIndicator } from 'office-ui-fabric-react/lib/ProgressIndicator';
 import { PrimaryButton } from 'office-ui-fabric-react/lib/Button';
@@ -14,11 +13,12 @@ import { IQuestionDetails, IResponseDetails, IPollAnalyticsInfo } from '../../..
 import SPHelper from '../../../Common/SPHelper';
 import { MessageScope } from '../../../Common/enumHelper';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 
 export default class SimplePoll extends React.Component<ISimplePollProps, ISimplePollState> {
   private helper: SPHelper = null;
   private disQuestionId: string;
-  private currentUserResponse: JSX.Element = null;
+  private displayQuestion: IQuestionDetails;
   constructor(props: ISimplePollProps) {
     super(props);
     this.state = {
@@ -26,6 +26,7 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
       PollQuestions: [],
       UserResponse: [],
       displayQuestionId: "",
+      displayQuestion: null,
       enableSubmit: true,
       enableChoices: true,
       showOptions: false,
@@ -47,9 +48,11 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
   }
 
   public componentDidUpdate = (prevProps: ISimplePollProps) => {
-    if (prevProps.pollQuestions !== this.props.pollQuestions) {
+    if (prevProps.pollQuestions !== this.props.pollQuestions || prevProps.pollBasedOnDate !== this.props.pollBasedOnDate) {
       this.setState({
-        UserResponse: []
+        UserResponse: [],
+        displayQuestion: null,
+        displayQuestionId: ''
       }, () => {
         this.getQuestions(this.props.pollQuestions);
       });
@@ -73,19 +76,6 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
     }
   }
 
-  // public componentWillReceiveProps = (nextProps: ISimplePollProps) => {
-  //   if (this.props.pollQuestions != nextProps.pollQuestions) {
-  //     this.getQuestions(nextProps.pollQuestions);
-  //   }
-  //   if (this.props.chartType != nextProps.chartType) {
-  //     let newPollAnalytics: IPollAnalyticsInfo = this.state.PollAnalytics;
-  //     newPollAnalytics.ChartType = nextProps.chartType;
-  //     this.setState({
-  //       PollAnalytics: newPollAnalytics
-  //     }, this.bindResponseAnalytics);
-  //   }
-  // }
-
   private getQuestions = (questions?: any[]) => {
     let pquestions: IQuestionDetails[] = [];
     let tmpQuestions: any[] = (questions) ? questions : (this.props.pollQuestions) ? this.props.pollQuestions : [];
@@ -98,12 +88,34 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
           UseDate: question.QUseDate,
           StartDate: new Date(question.QStartDate),
           EndDate: new Date(question.QEndDate),
-          MultiChoice: question.QMultiChoice
+          MultiChoice: question.QMultiChoice,
+          SortIdx: question.sortIdx
         });
       });
     }
-    this.disQuestionId = (pquestions && pquestions.length > 0) ? pquestions[0].Id : '';
-    this.setState({ PollQuestions: pquestions, displayQuestionId: this.disQuestionId }, this.bindPolls);
+    this.disQuestionId = this.getDisplayQuestionID(pquestions);
+    this.setState({ PollQuestions: pquestions, displayQuestionId: this.disQuestionId, displayQuestion: this.displayQuestion }, this.bindPolls);
+  }
+
+  private getDisplayQuestionID = (questions?: any[]) => {
+    let filQuestions: any[] = [];
+    if (questions.length > 0) {
+      if (this.props.pollBasedOnDate) {
+        filQuestions = _.filter(questions, (o) => { return moment().startOf('date') >= moment(o.StartDate) && moment(o.EndDate) >= moment().startOf('date'); });
+      } else {
+        filQuestions = _.orderBy(questions, ['SortIdx'], ['asc']);
+        this.displayQuestion = filQuestions[0];
+        return filQuestions[0].Id;
+      }
+      if (filQuestions.length > 0) {
+        filQuestions = _.orderBy(filQuestions, ['SortIdx'], ['asc']);
+        this.displayQuestion = filQuestions[0];
+        return filQuestions[0].Id;
+      } else {
+        this.displayQuestion = null;
+      }
+    }
+    return '';
   }
 
   private bindPolls = () => {
@@ -126,8 +138,8 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
     let prevUserResponse = this.state.UserResponse;
     let userresponse: IResponseDetails;
     userresponse = {
-      PollQuestionId: this.state.PollQuestions[0].Id,
-      PollQuestion: this.state.PollQuestions[0].DisplayName,
+      PollQuestionId: this.state.displayQuestion.Id,
+      PollQuestion: this.state.displayQuestion.DisplayName,
       PollResponse: !isMultiSel ? option.key : '',
       UserID: this.props.currentUserInfo.ID,
       UserDisplayName: this.props.currentUserInfo.DisplayName,
@@ -178,7 +190,8 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
         showSubmissionProgress: false,
         showMessage: true,
         isError: false,
-        MsgContent: (this.props.SuccessfullVoteSubmissionMsg && this.props.SuccessfullVoteSubmissionMsg.trim()) ? this.props.SuccessfullVoteSubmissionMsg.trim() : strings.SuccessfullVoteSubmission,
+        MsgContent: (this.props.SuccessfullVoteSubmissionMsg && this.props.SuccessfullVoteSubmissionMsg.trim()) ?
+          this.props.SuccessfullVoteSubmissionMsg.trim() : strings.SuccessfullVoteSubmission,
         showChartProgress: true
       }, this.getAllUsersResponse);
     } catch (err) {
@@ -218,13 +231,13 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
   }
 
   private bindResponseAnalytics = () => {
-    const { PollQuestions } = this.state;
+    const { PollQuestions, displayQuestion } = this.state;
     let tmpUserResponse: any = this.state.UserResponse;
     if (tmpUserResponse && tmpUserResponse.length > 0) {
       var tempData: any;
-      let qChoices: string[] = PollQuestions[0].Choices.split(',');
+      let qChoices: string[] = displayQuestion.Choices.split(',');
       var finalData = [];
-      if (!PollQuestions[0].MultiChoice) {
+      if (!displayQuestion.MultiChoice) {
         tempData = _.countBy(tmpUserResponse, 'Response');
       } else {
         var data = [];
@@ -249,7 +262,7 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
       pollAnalytics = {
         ChartType: this.props.chartType,
         Labels: qChoices,
-        Question: PollQuestions[0].DisplayName,
+        Question: displayQuestion.DisplayName,
         PollResponse: finalData
       };
       this.setState({
@@ -269,12 +282,13 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
   }
 
   public render(): React.ReactElement<ISimplePollProps> {
-    const { pollQuestions, BtnSubmitVoteText, ResponseMsgToUser } = this.props;
+    const { pollQuestions, BtnSubmitVoteText, ResponseMsgToUser, NoPollMsg } = this.props;
     const { showProgress, enableChoices, showSubmissionProgress, showChartProgress, PollQuestions, showMessage, MsgContent, isError,
-      showOptions, showChart, PollAnalytics, currentPollResponse, enableSubmit, listExists } = this.state;
+      showOptions, showChart, PollAnalytics, currentPollResponse, enableSubmit, listExists, displayQuestion } = this.state;
     const showConfig: boolean = (!pollQuestions || pollQuestions.length <= 0 && (!PollQuestions || PollQuestions.length <= 0)) ? true : false;
     let userResponseCaption: string = (ResponseMsgToUser && ResponseMsgToUser.trim()) ? ResponseMsgToUser.trim() : strings.DefaultResponseMsgToUser;
     let submitButtonText: string = (BtnSubmitVoteText && BtnSubmitVoteText.trim()) ? BtnSubmitVoteText.trim() : strings.BtnSumbitVote;
+    let nopollmsg: string = (NoPollMsg && NoPollMsg.trim()) ? NoPollMsg.trim() : strings.NoPollMsgDefault;
     return (
       <div className={styles.simplePoll}>
         {!listExists ? (
@@ -291,21 +305,24 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
               {showProgress && !showChart &&
                 <ProgressIndicator label={strings.QuestionLoadingText} description={strings.PlsWait} />
               }
-              {PollQuestions && PollQuestions.length > 0 && showOptions &&
+              {!displayQuestion &&
+                <MessageContainer MessageScope={MessageScope.Info} Message={nopollmsg} />
+              }
+              {PollQuestions && PollQuestions.length > 0 && showOptions && displayQuestion &&
                 <div className="ms-Grid" dir="ltr">
                   <div className="ms-Grid-row">
                     <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
                       <div className="ms-textAlignLeft ms-font-m-plus ms-fontWeight-semibold">
-                        {PollQuestions[0].DisplayName}
+                        {displayQuestion.DisplayName}
                       </div>
                     </div>
                   </div>
                   <div className="ms-Grid-row">
                     <div className="ms-Grid-col ms-lg12 ms-md12 ms-sm12">
                       <div className="ms-textAlignLeft ms-font-m-plus ms-fontWeight-semibold">
-                        <OptionsContainer disabled={!enableChoices} multiSelect={PollQuestions[0].MultiChoice}
+                        <OptionsContainer disabled={!enableChoices} multiSelect={displayQuestion.MultiChoice}
                           selectedKey={this._getSelectedKey}
-                          options={PollQuestions[0].Choices}
+                          options={displayQuestion.Choices}
                           label="Pick One"
                           onChange={this._onChange}
                         />

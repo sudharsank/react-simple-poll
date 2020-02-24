@@ -9,6 +9,8 @@ define([], function() {
     QuestionLoadingText: "Loading Poll data",
     SubmissionLoadingText: "Submission is inprogress",
     PlsWait: "Please wait...",
+    PollDateLabel: "Display poll based on date",
+    PollDateCalloutText: "Turning on will display the polls based on the 'Start Date' & 'End Date'",
     PollQuestionsLabel: "Poll Questions:",
     PollQuestionsPanelHeader: "Poll Questions list",
     PollQuestionsManageButton: "Manage Questions Info",
@@ -22,16 +24,22 @@ define([], function() {
     SuccessfullVoteSubmission: "Thank you for your submission",
     FailedVoteSubmission: "Sorry, something wrong while submitting. Please try again after sometime.",
     BtnSumbitVote: "Submit Vote",
-    BtnSumbitVoteLabel: "Submit button text:",
+    BtnSumbitVoteLabel: "Submit Button Text:",
     BtnSumbitVoteDescription: "Text to display on the submit button. Max of 50 characters are allowed",
     BtnSumbitVotePlaceholder: "Submit button text...",
     ChartFieldLabel: "Preferred Chart Type",
     ChartFieldCalloutText: "Select preferrable chart type",
+    NoPollMsgLabel: "No Poll Message:",
+    NoPollMsgDescription: "Message to be displayed when there is no polls.",
+    NoPollMsgPlaceholder: "Message...",
+    NoPollMsgDefault: "Sorry, no polls to display!",
 
     Q_Title_Title: "Question Title",
     Q_Title_Placeholder: "Question Title...",
     Q_Options_Title: "Choices",
     Q_Options_Placeholder: "Choices separated by comma",
-    MultiChoice_Title: "Multi Selection"
+    MultiChoice_Title: "Multi Selection",
+    Q_StartDate_Title: "Start Date",
+    Q_EndDate_Title: "End Date"
   }
 });

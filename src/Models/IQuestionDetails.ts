@@ -6,4 +6,5 @@ export interface IQuestionDetails {
 	StartDate: Date;
 	EndDate: Date;
 	UseDate: boolean;
+	SortIdx: number;
 }

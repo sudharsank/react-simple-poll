@@ -15,7 +15,8 @@
     "description": { "default": "A quick poll." },
     "officeFabricIconFontName": "BarChartVerticalEdit",
     "properties": {
-      "chartType": "doughnut"
+      "chartType": "doughnut",
+      "pollBasedOnDate": false
     }
   }]
 }

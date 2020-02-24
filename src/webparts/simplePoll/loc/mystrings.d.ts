@@ -8,6 +8,8 @@ declare interface ISimplePollWebPartStrings {
   QuestionLoadingText: string;
   SubmissionLoadingText: string;
   PlsWait: string;
+  PollDateLabel: string;
+  PollDateCalloutText: string;
   PollQuestionsLabel: string;
   PollQuestionsPanelHeader: string;
   PollQuestionsManageButton: string;
@@ -26,12 +28,18 @@ declare interface ISimplePollWebPartStrings {
   BtnSumbitVotePlaceholder: string;
   ChartFieldLabel: string;
   ChartFieldCalloutText:string;
+  NoPollMsgLabel: string;
+  NoPollMsgDescription: string;
+  NoPollMsgPlaceholder: string;
+  NoPollMsgDefault: string;
 
   Q_Title_Title: string;
   Q_Title_Placeholder: string;
   Q_Options_Title: string;
   Q_Options_Placeholder: string;
   MultiChoice_Title: string;
+  Q_StartDate_Title: string;
+  Q_EndDate_Title: string;
 }
 
 declare module 'SimplePollWebPartStrings' {
