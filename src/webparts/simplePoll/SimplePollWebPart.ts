@@ -187,10 +187,20 @@ export default class SimplePollWebPart extends BaseClientSideWebPart<ISimplePoll
                       checked: this.properties.chartType === ChartType.Doughnut,
                       iconProps: { officeFabricIconFontName: 'DonutChart' }
                     }, {
-                      key: 'polarArea',
-                      text: 'PolarArea',
-                      checked: this.properties.chartType === ChartType.PolarArea,
-                      iconProps: { officeFabricIconFontName: 'ScatterChart' }
+                      key: 'bar',
+                      text: 'Bar',
+                      checked: this.properties.chartType === ChartType.Bar,
+                      iconProps: { officeFabricIconFontName: 'BarChartVertical' }
+                    }, {
+                      key: 'horizontalBar',
+                      text: 'Horizontal Bar',
+                      checked: this.properties.chartType === ChartType.HorizontalBar,
+                      iconProps: { officeFabricIconFontName: 'BarChartHorizontal' }
+                    }, {
+                      key: 'line',
+                      text: 'Line',
+                      checked: this.properties.chartType === ChartType.Line,
+                      iconProps: { officeFabricIconFontName: 'LineChart' }
                     }]
                 })
               ]

@@ -34,15 +34,31 @@ export default class QuickPollChart extends React.Component<IQuickPollChartProps
     if (undefined !== this.props.PollAnalytics) {
       this.getChartType();
       return (
-        <ChartControl
-          loadingtemplate={() => <div>Please wait...</div>}
-          type={this.charttype}
-          data={{
-            labels: PollAnalytics.Labels,
-            datasets: [{
-              data: PollAnalytics.PollResponse
-            }]
-          }} />
+        this.charttype == ChartType.Line ? (
+          <ChartControl
+            loadingtemplate={() => <div>Please wait...</div>}
+            type={this.charttype}
+            data={{
+              labels: PollAnalytics.Labels,
+              datasets: [{
+                label: 'Results',
+                data: PollAnalytics.PollResponse,
+                fill: false,
+                borderColor: "rgb(77, 139, 240)"
+              }]
+            }} />
+        ) : (
+            <ChartControl
+              loadingtemplate={() => <div>Please wait...</div>}
+              type={this.charttype}
+              data={{
+                labels: PollAnalytics.Labels,
+                datasets: [{
+                  label: 'Results',
+                  data: PollAnalytics.PollResponse,
+                }]
+              }} />
+          )
       );
     }
   }
@@ -55,8 +71,14 @@ export default class QuickPollChart extends React.Component<IQuickPollChartProps
       case 'doughnut':
         this.charttype = ChartType.Doughnut;
         break;
-      case 'polararea':
-        this.charttype = ChartType.PolarArea;
+      case 'bar':
+        this.charttype = ChartType.Bar;
+        break;
+      case 'horizontalbar':
+        this.charttype = ChartType.HorizontalBar;
+        break;
+      case 'line':
+        this.charttype = ChartType.Line;
         break;
       default:
         this.charttype = ChartType.Doughnut;

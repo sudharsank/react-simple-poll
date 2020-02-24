@@ -47,7 +47,13 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
   }
 
   public componentDidUpdate = (prevProps: ISimplePollProps) => {
-    if (prevProps.pollQuestions !== this.props.pollQuestions) this.getQuestions(this.props.pollQuestions);
+    if (prevProps.pollQuestions !== this.props.pollQuestions) {
+      this.setState({
+        UserResponse: []
+      }, () => {
+        this.getQuestions(this.props.pollQuestions);
+      });
+    }
     if (prevProps.chartType !== this.props.chartType) {
       let newPollAnalytics: IPollAnalyticsInfo = this.state.PollAnalytics;
       newPollAnalytics.ChartType = this.props.chartType;
@@ -227,7 +233,7 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
             res.MultiResponse.map((finres: any) => {
               data.push({
                 "UserID": res.UserID,
-                "Response": finres
+                "Response": finres.trim()
               });
             });
           }
@@ -235,9 +241,9 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
         tempData = _.countBy(data, 'Response');
       }
       qChoices.map((label) => {
-        if (tempData[label] == undefined) {
+        if (tempData[label.trim()] == undefined) {
           finalData.push(0);
-        } else finalData.push(tempData[label]);
+        } else finalData.push(tempData[label.trim()]);
       });
       var pollAnalytics: IPollAnalyticsInfo;
       pollAnalytics = {
