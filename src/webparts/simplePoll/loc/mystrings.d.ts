@@ -26,6 +26,7 @@ declare interface ISimplePollWebPartStrings {
   BtnSumbitVoteLabel: string;
   BtnSumbitVoteDescription: string;
   BtnSumbitVotePlaceholder: string;
+  SubmitValidationMessage: string;
   ChartFieldLabel: string;
   ChartFieldCalloutText:string;
   NoPollMsgLabel: string;

@@ -180,31 +180,53 @@ export default class SimplePoll extends React.Component<ISimplePollProps, ISimpl
       ...this.state,
       enableSubmit: false,
       enableChoices: false,
-      showSubmissionProgress: true
+      showSubmissionProgress: false,
+      isError: false,
+      MsgContent: '',
+      showMessage: false
     });
     var curUserRes = this.getUserResponse(this.state.UserResponse);
-    try {
-      await this.helper.submitResponse(curUserRes[0]);
+    if (curUserRes.length <= 0) {
       this.setState({
-        ...this.state,
-        showSubmissionProgress: false,
+        MsgContent: strings.SubmitValidationMessage,
+        isError: true,
         showMessage: true,
-        isError: false,
-        MsgContent: (this.props.SuccessfullVoteSubmissionMsg && this.props.SuccessfullVoteSubmissionMsg.trim()) ?
-          this.props.SuccessfullVoteSubmissionMsg.trim() : strings.SuccessfullVoteSubmission,
-        showChartProgress: true
-      }, this.getAllUsersResponse);
-    } catch (err) {
-      console.log(err);
-      this.setState({
-        ...this.state,
         enableSubmit: true,
         enableChoices: true,
-        showSubmissionProgress: false,
-        showMessage: true,
-        isError: true,
-        MsgContent: strings.FailedVoteSubmission
       });
+    } else {
+      this.setState({
+        ...this.state,
+        enableSubmit: false,
+        enableChoices: false,
+        showSubmissionProgress: true,
+        isError: false,
+        MsgContent: '',
+        showMessage: false
+      });
+      try {
+        await this.helper.submitResponse(curUserRes[0]);
+        this.setState({
+          ...this.state,
+          showSubmissionProgress: false,
+          showMessage: true,
+          isError: false,
+          MsgContent: (this.props.SuccessfullVoteSubmissionMsg && this.props.SuccessfullVoteSubmissionMsg.trim()) ?
+            this.props.SuccessfullVoteSubmissionMsg.trim() : strings.SuccessfullVoteSubmission,
+          showChartProgress: true
+        }, this.getAllUsersResponse);
+      } catch (err) {
+        console.log(err);
+        this.setState({
+          ...this.state,
+          enableSubmit: true,
+          enableChoices: true,
+          showSubmissionProgress: false,
+          showMessage: true,
+          isError: true,
+          MsgContent: strings.FailedVoteSubmission
+        });
+      }
     }
   }
 

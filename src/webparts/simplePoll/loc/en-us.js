@@ -27,6 +27,7 @@ define([], function() {
     BtnSumbitVoteLabel: "Submit Button Text:",
     BtnSumbitVoteDescription: "Text to display on the submit button. Max of 50 characters are allowed",
     BtnSumbitVotePlaceholder: "Submit button text...",
+    SubmitValidationMessage: "Please select any option!",
     ChartFieldLabel: "Preferred Chart Type",
     ChartFieldCalloutText: "Select preferrable chart type",
     NoPollMsgLabel: "No Poll Message:",
