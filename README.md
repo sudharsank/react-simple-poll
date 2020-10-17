@@ -48,19 +48,20 @@
 
 ## Prerequisites
  
-> **@microsoft/generator-sharepoint - 1.10.0**
+> **@microsoft/generator-sharepoint - 1.11.0**
 
 ## Solution
 
 Solution|Author(s)
 --------|---------
-react-quick-poll | Sudharsan K.([@sudharsank](https://twitter.com/sudharsank), [Know More](http://windowssharepointserver.blogspot.com/))
+react-quick-poll | Sudharsan K.([@sudharsank](https://twitter.com/sudharsank), [Know More](https://spknowledge.com/))
 
 ## Version history
 
 Version|Date|Comments
 -------|----|--------
 1.0.0.1|Feb 24 2020|Initial release
+2.0.0.0|Oct 17 2020|Initial release
 
 ## Disclaimer
 **THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.**
